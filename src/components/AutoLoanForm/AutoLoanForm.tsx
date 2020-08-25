@@ -4,8 +4,11 @@ import { useFormik } from 'formik';
 import { IAutoLoanFormValues } from '../../types';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { addApplicationInfo } from '../../redux';
+import { useDispatch } from 'react-redux';
 
 const AutoLoanForm: React.FC<{}> = () => {
+    const dispatch = useDispatch();
 
     const validationSchema: Yup.ObjectSchema<IAutoLoanFormValues> = Yup.object({
         price: Yup.number().required('Required'),
@@ -24,9 +27,9 @@ const AutoLoanForm: React.FC<{}> = () => {
     }
 
     const onSubmit = (values: IAutoLoanFormValues, onSubmitProps: any) => {
-      axios.get<IAutoLoanFormValues>("api/prequalified", { params: values })
+      axios.get("api/prequalified", { params: values })
         .then(response => {
-          console.log({response});
+          dispatch(addApplicationInfo(response.data.data))
           onSubmitProps.setSubmitting(false);
           onSubmitProps.resetForm();
         }).catch(err => {
