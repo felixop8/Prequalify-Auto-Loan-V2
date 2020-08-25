@@ -5,3 +5,9 @@ export interface IAutoLoanFormValues {
     income: '' | number,
     credit: '' | number
 }
+
+export interface IRegistrationFormValues {
+    email: string,
+    password: string
+    confirmPassword: string
+}
