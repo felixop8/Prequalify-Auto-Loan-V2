@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
 import { IRegistrationFormValues } from '../../types';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const RegistrationForm: React.FC<{}> = () => {
 
@@ -23,14 +24,14 @@ const RegistrationForm: React.FC<{}> = () => {
     }
 
     const onSubmit = (values: IRegistrationFormValues, onSubmitProps: any) => {
-      console.log(values);
-        // Add logic Axios request...
-
-        //
-        setTimeout(() => {
-            onSubmitProps.setSubmitting(false);
-            onSubmitProps.resetForm();
-        }, 5000)
+      axios.post<IRegistrationFormValues>("api/user", values)
+        .then(response => {
+          console.log({response});
+          onSubmitProps.setSubmitting(false);
+          onSubmitProps.resetForm();
+        }).catch(err => {
+          console.log({err});
+        })
     }
 
       // Formik hook

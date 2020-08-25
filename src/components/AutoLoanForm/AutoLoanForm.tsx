@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
 import { IAutoLoanFormValues } from '../../types';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const AutoLoanForm: React.FC<{}> = () => {
 
@@ -23,13 +24,14 @@ const AutoLoanForm: React.FC<{}> = () => {
     }
 
     const onSubmit = (values: IAutoLoanFormValues, onSubmitProps: any) => {
-        // Add logic Axios request...
-
-        //
-        setTimeout(() => {
-            onSubmitProps.setSubmitting(false);
-            onSubmitProps.resetForm();
-        }, 5000)
+      axios.get<IAutoLoanFormValues>("api/prequalified", { params: values })
+        .then(response => {
+          console.log({response});
+          onSubmitProps.setSubmitting(false);
+          onSubmitProps.resetForm();
+        }).catch(err => {
+          console.log({err});
+        })
     }
     
 
