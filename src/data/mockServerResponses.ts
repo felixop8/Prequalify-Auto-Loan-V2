@@ -6,7 +6,7 @@ export const qualifiedLoanData: IQualificationResponseValues = {
   'Prequalification can help you determine whether you might be approved for a loan and an estimation of rates you might receive when shopping for a car.',
   prequalification_status: 1,
   resolution_message: 'Congratulations! Based on the information furnished by you, we are pleased to inform you that you pre-qualify for a car loan.',
-  applicationData: {
+  application_data: {
     price: '',
     make: '',
     model: '',
@@ -21,7 +21,7 @@ export const desqualifiedLoanData: IQualificationResponseValues = {
   'Prequalification can help you determine whether you might be approved for a loan and an estimation of rates you might receive when shopping for a car.',
   prequalification_status: 0,
   resolution_message: 'We are sorry to inform you that your application for a car loan has been rejected',
-  applicationData: {
+  application_data: {
     price: '',
     make: '',
     model: '',

@@ -17,5 +17,5 @@ export interface IQualificationResponseValues {
     description: string,
     prequalification_status: number,
     resolution_message: string,
-    applicationData: IAutoLoanFormValues
+    application_data: IAutoLoanFormValues
 }
