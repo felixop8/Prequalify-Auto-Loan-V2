@@ -28,6 +28,7 @@ const AutoLoanForm: React.FC<{}> = () => {
         //
         setTimeout(() => {
             onSubmitProps.setSubmitting(false);
+            onSubmitProps.resetForm();
         }, 5000)
     }
     
@@ -47,7 +48,8 @@ const AutoLoanForm: React.FC<{}> = () => {
         <div className="container">
         <div className="row mb-5">
           <div className="col-lg-12 text-center">
-            <h1 className="mt-5">Auto Loan Form</h1>
+            <h1 className="mt-5">Get prequalified today</h1>
+            <p>Discover how much you can borrow, based on your income and credit.</p>
           </div>
         </div>
         <div className="row">
