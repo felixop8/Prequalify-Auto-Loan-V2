@@ -11,6 +11,7 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "@types/yup": "^0.29.6",
+    "axios": "^0.20.0",
     "bootstrap": "^4.5.2",
     "formik": "^2.1.5",
     "react": "^16.13.1",
@@ -41,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "miragejs": "^0.1.40",
     "prettier": "^2.1.0",
     "pretty-quick": "^3.0.0"
   },
