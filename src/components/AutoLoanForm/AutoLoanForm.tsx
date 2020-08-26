@@ -6,9 +6,11 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import { addApplicationInfo } from '../../redux';
 import { useDispatch } from 'react-redux';
+import { useHistory } from "react-router-dom";
 
 const AutoLoanForm: React.FC<{}> = () => {
     const dispatch = useDispatch();
+    let history = useHistory();
 
     const validationSchema: Yup.ObjectSchema<IAutoLoanFormValues> = Yup.object({
         price: Yup.number().required('Required'),
@@ -30,8 +32,17 @@ const AutoLoanForm: React.FC<{}> = () => {
       axios.get("api/prequalified", { params: values })
         .then(response => {
           dispatch(addApplicationInfo(response.data.data))
+
           onSubmitProps.setSubmitting(false);
           onSubmitProps.resetForm();
+
+          if(Object.is(response.data.data.prequalification_status, 1)){
+            history.push("/registration");
+          } else {
+            history.push("/disqualification");
+          }
+          
+         
         }).catch(err => {
           console.log({err});
         })
