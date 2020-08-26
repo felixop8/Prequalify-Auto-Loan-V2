@@ -1,11 +1,15 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
-import { IRegistrationFormValues } from '../../types';
+import { IRegistrationFormValues, IQualificationResponseValues } from '../../types';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { newLogin } from '../../redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 const RegistrationForm: React.FC<{}> = () => {
+    const dispatch = useDispatch();
+    const { resolution_message } = useSelector((state: any) => state.applicationState);
 
     const validationSchema: Yup.ObjectSchema<IRegistrationFormValues> = Yup.object({
         email: Yup.string().email('Invalid email format').required('Required'),
@@ -24,9 +28,9 @@ const RegistrationForm: React.FC<{}> = () => {
     }
 
     const onSubmit = (values: IRegistrationFormValues, onSubmitProps: any) => {
-      axios.post<IRegistrationFormValues>("api/user", values)
+      axios.post("api/user", values)
         .then(response => {
-          console.log({response});
+          dispatch(newLogin(response.data.data))
           onSubmitProps.setSubmitting(false);
           onSubmitProps.resetForm();
         }).catch(err => {
@@ -46,6 +50,7 @@ const RegistrationForm: React.FC<{}> = () => {
         <div className="container">
         <div className="row mb-5">
           <div className="col-lg-12 text-center">
+            <h1 className="mt-5">{ resolution_message }</h1>
             <h1 className="mt-5">Sign Up</h1>
             <p>Lorem ipsum dolor sit amet! Neque poro quisquam est qui do dolor amet, adipisci velit...</p>
           </div>

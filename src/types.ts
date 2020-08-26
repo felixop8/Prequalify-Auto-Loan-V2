@@ -19,3 +19,9 @@ export interface IQualificationResponseValues {
     resolution_message: string,
     application_data: IAutoLoanFormValues
 }
+
+export interface INewLoginValues {
+    username: string,
+    isUserLoggedIn: boolean,
+    message: string
+}
