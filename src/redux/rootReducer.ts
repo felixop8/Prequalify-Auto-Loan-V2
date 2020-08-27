@@ -1,6 +1,14 @@
 import { combineReducers } from 'redux';
 
-import userRegistrationReducer from './userRegistration/userRegistrationReducer';
-import carLoanApplicationReducer from './carLoanApplication/carLoanApplicationReducer';
+import userReducer from './user/userReducer';
+import prequalifyReducer from './prequalify/prequalifyReducer';
 
-export default combineReducers({ userLogin: userRegistrationReducer, applicationState: carLoanApplicationReducer });
+const rootReducer = combineReducers({ 
+    user: userReducer, 
+    prequalify: prequalifyReducer 
+});
+
+export default rootReducer;
+
+// Use ReturnType to infer state shape from the rootReducer.
+export type RootState = ReturnType<typeof rootReducer>

@@ -1,4 +1,4 @@
-export interface IAutoLoanFormValues {
+export interface IPrequalifyValues {
     price: number | '',
     make: string,
     model: string,
@@ -6,22 +6,19 @@ export interface IAutoLoanFormValues {
     credit: number | ''
 }
 
-export interface IRegistrationFormValues {
+export interface ICreateAccountValues {
     email: string,
     password: string
     confirmPassword: string
 }
 
-export interface IQualificationResponseValues {
-    name: string,
-    description: string,
-    prequalification_status: number,
-    resolution_message: string,
-    application_data: IAutoLoanFormValues
+export interface IPrequalifyStatusValues {
+    prequalify_status: number,
+    prequalify_result_message: string,
+    prequalify_data: IPrequalifyValues
 }
 
-export interface INewLoginValues {
+export interface IAccountValues {
     username: string,
-    isUserLoggedIn: boolean,
-    message: string
+    isLoggedIn: boolean
 }

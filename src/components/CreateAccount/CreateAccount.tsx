@@ -1,17 +1,22 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
-import { IRegistrationFormValues, IQualificationResponseValues } from '../../types';
+import { ICreateAccountValues } from '../../types';
+import { RootState } from '../../redux/rootReducer';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { newLogin } from '../../redux';
+import { loggedIn } from '../../redux';
 import { useSelector, useDispatch } from 'react-redux';
 
-const RegistrationForm: React.FC<{}> = () => {
+const CreateAccount: React.FC<{}> = () => {
     const dispatch = useDispatch();
-    const { resolution_message } = useSelector((state: any) => state.applicationState);
 
-    const validationSchema: Yup.ObjectSchema<IRegistrationFormValues> = Yup.object({
+    // Gets the prequalify result message from Redux store - reducer 'prequalify'.
+    const selectPrequalifyResultMessage = (state: RootState) => state.prequalify.prequalify_result_message;
+    const prequalifyResultMessage = useSelector(selectPrequalifyResultMessage);
+
+    // Validation Schema for new account form — Formik + Yup = :) 
+    const validationSchema: Yup.ObjectSchema<ICreateAccountValues> = Yup.object({
         email: Yup.string().email('Invalid email format').required('Required'),
         password: Yup.string().min(8, 'At least 8 characters.')
         .matches(/[a-z]/, 'At least one lowercase char')
@@ -21,19 +26,26 @@ const RegistrationForm: React.FC<{}> = () => {
         confirmPassword: Yup.string().oneOf([Yup.ref('password'), ''], 'Password must match').required('Required'),
     }).defined();
 
-    const initialValues: IRegistrationFormValues = {
+    // Instead of using React 'useState' hook, Formik provides its own state management methods.
+    const initialValues: ICreateAccountValues = {
         email: '',
         password: '',
         confirmPassword: ''
     }
 
-    const onSubmit = (values: IRegistrationFormValues, onSubmitProps: any) => {
-      axios.post("api/user", values)
+    const onSubmit = (values: ICreateAccountValues, onSubmitProps: any) => {
+      // Axios post request to create a new account.
+      axios.post("api/create/accounts", values)
         .then(response => {
-          dispatch(newLogin(response.data.data))
+          // On successful new account set user as logged in.
+          dispatch(loggedIn(response.data.data))
+          
+          //Reset form
           onSubmitProps.setSubmitting(false);
           onSubmitProps.resetForm();
         }).catch(err => {
+           // I am just console.log the error here, but of course it would be nice
+          // to have log monitoring & Analysis app, and maybe PagerDuty :((
           console.log({err});
         })
     }
@@ -46,13 +58,16 @@ const RegistrationForm: React.FC<{}> = () => {
     });
 
 
+    // Formik returns a helper method called "getFieldProps()", this method returns
+    // a group of functions — onChange, onBlur, value and checked — for a given field. I used the
+    // spread operator on each field to reduce boilerplate.
     return (
         <div className="container">
         <div className="row mb-5">
           <div className="col-lg-12 text-center">
-            <h1 className="mt-5">{ resolution_message }</h1>
-            <h1 className="mt-5">Sign Up</h1>
-            <p>Lorem ipsum dolor sit amet! Neque poro quisquam est qui do dolor amet, adipisci velit...</p>
+            <h1 className="mt-5">{ prequalifyResultMessage }</h1>
+            <h1 className="mt-5">Next step is to create an account:</h1>
+
           </div>
         </div>
         <div className="row">
@@ -104,7 +119,7 @@ const RegistrationForm: React.FC<{}> = () => {
                 className="btn btn-primary btn-block"
                 disabled={!(formik.dirty && formik.isValid) || formik.isSubmitting}
               >
-                  {formik.isSubmitting ? "Please wait..." : "Submit"}
+                  {formik.isSubmitting ? "Please wait..." : "Create account"}
               </button>
             </form>
           </div>
@@ -113,4 +128,4 @@ const RegistrationForm: React.FC<{}> = () => {
     )
 }
 
-export default RegistrationForm
+export default CreateAccount

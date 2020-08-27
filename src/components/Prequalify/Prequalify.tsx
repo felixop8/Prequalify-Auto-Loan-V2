@@ -1,26 +1,31 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
-import { IAutoLoanFormValues } from '../../types';
-import * as Yup from 'yup';
+import { IPrequalifyValues } from '../../types';
+import * as yup from 'yup';
 import axios from 'axios';
-import { addApplicationInfo } from '../../redux';
+import { setPreQualificationStatus } from '../../redux';
 import { useDispatch } from 'react-redux';
 import { useHistory } from "react-router-dom";
 
-const AutoLoanForm: React.FC<{}> = () => {
+const Prequalify: React.FC<{}> = () => {
     const dispatch = useDispatch();
     let history = useHistory();
 
-    const validationSchema: Yup.ObjectSchema<IAutoLoanFormValues> = Yup.object({
-        price: Yup.number().required('Required'),
-        make: Yup.string().required('Required'),
-        model: Yup.string().required('Required'),
-        income: Yup.number().required('Required'),
-        credit: Yup.number().min(300, 'Min score value 300').max(850, 'Max score value 850').required('Required'),
+    // Validation Schema for prequalify form — Formik + Yup = :) 
+    const validationSchema: yup.ObjectSchema<IPrequalifyValues> = yup.object({
+        price: yup.number().required('Required'),
+        make: yup.string().required('Required'),
+        model: yup.string().required('Required'),
+        income: yup.number().required('Required'),
+        credit: yup.number().min(300, 'Min score value 300').max(850, 'Max score value 850').required('Required'),
     }).defined();
 
-    const initialValues: IAutoLoanFormValues = {
+    // Instead of using React 'useState' hook, Formik provides its own state management methods.
+    // Since inputs of the type 'number' are initialized as an empty string,
+    // the initial values for price, income and credit can be of the type 'number'
+    // or empty string ''.
+    const initialValues: IPrequalifyValues = {
         price: '',
         make: '',
         model: '',
@@ -28,22 +33,32 @@ const AutoLoanForm: React.FC<{}> = () => {
         credit: ''
     }
 
-    const onSubmit = (values: IAutoLoanFormValues, onSubmitProps: any) => {
-      axios.get("api/prequalified", { params: values })
+    const onSubmit = (values: IPrequalifyValues, onSubmitProps: any) => {
+      // Axios fetch call to check if customer qualify for a loan.
+      axios.get("api/prequalify", { params: values })
         .then(response => {
-          dispatch(addApplicationInfo(response.data.data))
+          // Dispatch action to set the prequalification result in Redux,
+          // that way we can access this data later on.
+          dispatch(setPreQualificationStatus(response.data.data))
 
+          // Reset form.
           onSubmitProps.setSubmitting(false);
           onSubmitProps.resetForm();
 
-          if(Object.is(response.data.data.prequalification_status, 1)){
-            history.push("/registration");
+          // Depending on the qualification flag redirect customer to 
+          // the disqualified page or to the create user account page.
+          //
+          // Another way I think this can be done is redirecting customer to
+          // a template page, and handle the disqualified condition there
+          // to display the form or the disqualified message.
+          if(Object.is(response.data.data.prequalify_status, 1)){
+            history.push("/account");
           } else {
-            history.push("/disqualification");
+            history.push("/disqualified");
           }
-          
-         
         }).catch(err => {
+          // I am just console.log the error here, but of course it would be nice
+          // to have log monitoring & Analysis app, and maybe PagerDuty :((
           console.log({err});
         })
     }
@@ -58,13 +73,13 @@ const AutoLoanForm: React.FC<{}> = () => {
 
 
     // Formik returns a helper method called "getFieldProps()", this method returns
-    // a group functions — onChange, onBlur, value and checked — for a given field. I used the
+    // a group of functions — onChange, onBlur, value and checked — for a given field. I used the
     // spread operator on each field to reduce boilerplate.
     return (
         <div className="container">
         <div className="row mb-5">
           <div className="col-lg-12 text-center">
-            <h1 className="mt-5">Get prequalified today</h1>
+            <h1 className="mt-5">Get Pre-Qualified Today</h1>
             <p>Discover how much you can borrow, based on your income and credit.</p>
           </div>
         </div>
@@ -135,6 +150,7 @@ const AutoLoanForm: React.FC<{}> = () => {
                   }`}
                   { ...formik.getFieldProps('credit')}
                 />
+                <small>(min 300 - max 850)</small>
                  {formik.touched.credit && formik.errors.credit ? <div className="invalid-feedback">{formik.errors.credit}</div> : null}
               </div>
 
@@ -152,4 +168,4 @@ const AutoLoanForm: React.FC<{}> = () => {
     )
 }
 
-export default AutoLoanForm
+export default Prequalify

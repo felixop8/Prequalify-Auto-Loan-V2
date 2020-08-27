@@ -1,22 +1,23 @@
 import React from 'react';
-import AutoLoanForm from './components/AutoLoanForm/AutoLoanForm';
-import RegistrationForm from './components/RegistrationForm/RegistrationForm';
-import DisqualificationPage from './components/DisqualificationPage/DisqualificationPage'
+import Prequalify from './components/Prequalify/Prequalify';
+import CreateAccount from './components/CreateAccount/CreateAccount';
+import Disqualified from './components/Disqualified/Disqualified'
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { useSelector } from 'react-redux';
+import { RootState } from './redux/rootReducer';
 
 function App() {
 return (
     <Router>
       <div>
         <Route exact path="/">
-          <AutoLoanForm />
+          <Prequalify />
         </Route>
-        <PrivateRoute path="/registration">
-          <RegistrationForm />
+        <PrivateRoute path="/account">
+          <CreateAccount />
         </PrivateRoute>
-        <Route path="/disqualification">
-          <DisqualificationPage />
+        <Route path="/disqualified">
+          <Disqualified />
         </Route>
       </div>
     </Router>
@@ -24,13 +25,13 @@ return (
 }
 
 function PrivateRoute({ children, ...rest }: any) {
-  const { prequalification_status } = useSelector((state: any) => state.applicationState);
+  const { prequalify_status } = useSelector((state: RootState) => state.prequalify);
 
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        Object.is(prequalification_status, 1) ? (
+        Object.is(prequalify_status, 1) ? (
           children
         ) : (
           <Redirect
