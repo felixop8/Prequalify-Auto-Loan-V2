@@ -181,7 +181,7 @@ const Prequalify: React.FC<{}> = () => {
           errors.length > 0 &&
             <div className="alert alert-danger" role="alert">
               <ul>
-                {errors.map((err) => <li>{err}</li>)}
+                {errors.map((err, i) => <li key={i}>{err}</li>)}
               </ul>
             </div>
         }
