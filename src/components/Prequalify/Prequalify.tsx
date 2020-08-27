@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
 import { IPrequalifyValues } from '../../types';
@@ -9,6 +9,8 @@ import { useDispatch } from 'react-redux';
 import { useHistory } from "react-router-dom";
 
 const Prequalify: React.FC<{}> = () => {
+    const [errors, setErrors] = useState([]);
+
     const dispatch = useDispatch();
     let history = useHistory();
 
@@ -60,6 +62,16 @@ const Prequalify: React.FC<{}> = () => {
           // I am just console.log the error here, but of course it would be nice
           // to have log monitoring & Analysis app, and maybe PagerDuty :((
           console.log({err});
+          // Reset form.
+          onSubmitProps.setSubmitting(false);
+          onSubmitProps.resetForm();
+          // Display the actual error that comes from the server?
+          // Or just have an error flag to display a generic error message?
+          //
+          // I am showing the error from the backend in this example using a bootstrap alert
+          // on this page, but normally I like to create a custom hook using 'toastr' 
+          // https://www.npmjs.com/package/toastr that can be used in any page.
+          setErrors(err.response.data.errors);
         })
     }
     
@@ -164,6 +176,16 @@ const Prequalify: React.FC<{}> = () => {
             </form>
           </div>
         </div>
+        <br/>
+        {
+          errors.length > 0 &&
+            <div className="alert alert-danger" role="alert">
+              <ul>
+                {errors.map((err) => <li>{err}</li>)}
+              </ul>
+            </div>
+        }
+        
       </div>
     )
 }
