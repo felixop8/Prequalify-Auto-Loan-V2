@@ -51,7 +51,8 @@
   "devDependencies": {
     "miragejs": "^0.1.40",
     "prettier": "^2.1.0",
-    "pretty-quick": "^3.0.0"
+    "pretty-quick": "^3.0.0",
+    "redux-mock-store": "^1.5.4"
   },
   "husky": {
     "hooks": {
