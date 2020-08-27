@@ -100,7 +100,7 @@ const Prequalify: React.FC<{}> = () => {
             <form onSubmit={formik.handleSubmit}>
 
               <div className="form-group">
-                <label htmlFor="price" >Auto Purchase Price</label>
+                <label htmlFor="price">Auto Purchase Price</label>
                 <input
                   type="number"
                   id="price"
@@ -110,7 +110,9 @@ const Prequalify: React.FC<{}> = () => {
                   
                   { ...formik.getFieldProps('price')}
                 />
-                {formik.touched.price && formik.errors.price ? <div className="invalid-feedback">{formik.errors.price}</div> : null}
+                {formik.touched.price && formik.errors.price ? 
+                  <div className="invalid-feedback">{formik.errors.price}</div> : 
+                  null}
               </div>
 
               <div className="form-group">
@@ -163,7 +165,9 @@ const Prequalify: React.FC<{}> = () => {
                   { ...formik.getFieldProps('credit')}
                 />
                 <small>(min 300 - max 850)</small>
-                 {formik.touched.credit && formik.errors.credit ? <div className="invalid-feedback">{formik.errors.credit}</div> : null}
+                 {formik.touched.credit && formik.errors.credit ? 
+                 <div data-testid={'errors-creditScore'} className="invalid-feedback">{formik.errors.credit}</div> :
+                  null}
               </div>
 
               <button
