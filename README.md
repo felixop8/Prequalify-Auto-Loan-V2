@@ -2,7 +2,7 @@
 
 In the project directory, you can run:
 
-## `yarn install`
+### `yarn install`
 
 Used to install all dependencies for the project.
 
