@@ -207,7 +207,7 @@ Test runner.
 For testing React components.
 
 
-## Available Scripts
+## AVAILABLE SCRIPTS
 
 
 In the project directory, you can run:
