@@ -6,6 +6,14 @@ export interface IPrequalifyValues {
     credit: number | ''
 }
 
+export interface IPrequalifyFormValues {
+    price: number | '',
+    make: string,
+    model: string,
+    income: number | '',
+    credit: number | ''
+}
+
 export interface ICreateAccountValues {
     email: string,
     password: string

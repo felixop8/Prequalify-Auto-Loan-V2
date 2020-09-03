@@ -17,9 +17,8 @@ export function makeServer({ environment = "test" } = {}) {
         // Since this is just a mock endpoint it doesn't include the appropiate backend validation.
         // I could have moved this into its own util function, but since this is just a mock and
         // this calculations mostlikely occurs in the server I didn't want to spend too much time on it.
-        if(parseInt(price) > 1000000) return new Response(400, { some: 'header' }, { errors: [ 'Car Price above threshold ($1,000,000).'] });
-        if( parseInt(price) > (parseInt(income) / 5) || parseInt(credit) < 600  ) return {data: desqualifiedLoanData};
-        
+        if(parseInt(price) > 1000000) return new Response(400, { some: 'header' }, { error:'Car Price above threshold ($1,000,000).' });
+        if( parseInt(price) > (parseInt(income) / 5) || parseInt(credit) < 600  ) return {data: desqualifiedLoanData}; 
         return {data: {...qualifiedLoanData, prequalify_data: request.queryParams}};
       });
 

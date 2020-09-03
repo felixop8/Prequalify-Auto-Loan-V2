@@ -1,4 +1,6 @@
-export const SET_PREQUALIFY_STATUS = "SET_PREQUALIFY_STATUS";
+export const FETCH_PREQUALIFY_REQUEST = "FETCH_PREQUALIFY_REQUEST";
+export const FETCH_PREQUALIFY_SUCCESS = "FETCH_PREQUALIFY_SUCCESS";
+export const FETCH_PREQUALIFY_ERROR = "FETCH_PREQUALIFY_ERROR";
 
 export interface IPrequalifyValuesState {
   price: number | '',
@@ -9,16 +11,36 @@ export interface IPrequalifyValuesState {
 }
 
 export interface IPrequalifyState {
-    prequalify_status: number,
-    prequalify_result_message: string,
-    prequalify_data: IPrequalifyValuesState
+  loading: boolean,
+  error: string,
+  prequalify_status: number | null,
+  prequalify_result_message: string,
+  prequalify_data: IPrequalifyValuesState
 }
 
-interface ISetPreQualifyAction {
-    type: typeof SET_PREQUALIFY_STATUS
-    payload: IPrequalifyState
-  }
+export interface IPrequalifySuccess {
+  prequalify_status: number,
+  prequalify_result_message: string,
+  prequalify_data: IPrequalifyValuesState
+}
+
+
+interface IFetchPrequalifyRequest {
+  type: typeof FETCH_PREQUALIFY_REQUEST
+}
+
+interface IFetchPrequalifySuccess {
+  type: typeof FETCH_PREQUALIFY_SUCCESS,
+  payload: IPrequalifySuccess
+}
+
+interface IFetchPrequalifyError {
+  type: typeof FETCH_PREQUALIFY_ERROR,
+  payload: string
+}
+
+
 
 // Note that we can use TypeScript's Union Type here to express all possible actions.
 // Example: export type IPrequalifyActionTypes = ISetPreQualifyAction; | IExampleAction
-export type IPrequalifyActionTypes = ISetPreQualifyAction;
+export type IPrequalifyActionTypes = IFetchPrequalifyRequest | IFetchPrequalifySuccess | IFetchPrequalifyError;

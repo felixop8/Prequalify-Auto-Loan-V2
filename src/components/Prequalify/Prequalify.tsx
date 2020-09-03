@@ -1,21 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
-import { IPrequalifyValues } from '../../types';
+import { IPrequalifyFormValues } from '../../types';
 import * as yup from 'yup';
-import axios from 'axios';
-import { setPreQualificationStatus } from '../../redux';
-import { useDispatch } from 'react-redux';
+import { fetchPrequalify } from '../../redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux/rootReducer';
 import { useHistory } from "react-router-dom";
 
 const Prequalify: React.FC<{}> = () => {
-    const [errors, setErrors] = useState([]);
 
     const dispatch = useDispatch();
-    let history = useHistory();
+    const history = useHistory();
+
+    const { loading, error, prequalify_status } = useSelector((state: RootState) => state.prequalify);
+  
+
+    useEffect(() => {
+      if(prequalify_status === 1) {
+        history.push("/account");
+      } else if(prequalify_status === 0) {
+        history.push("/disqualified");
+      }
+    }, [prequalify_status])
+
 
     // Validation Schema for prequalify form — Formik + Yup = :) 
-    const validationSchema: yup.ObjectSchema<IPrequalifyValues> = yup.object({
+    const validationSchema: yup.ObjectSchema<IPrequalifyFormValues> = yup.object({
         price: yup.number().required('Required'),
         make: yup.string().required('Required'),
         model: yup.string().required('Required'),
@@ -27,52 +38,16 @@ const Prequalify: React.FC<{}> = () => {
     // Since inputs of the type 'number' are initialized as an empty string,
     // the initial values for price, income and credit can be of the type 'number'
     // or empty string ''.
-    const initialValues: IPrequalifyValues = {
+    const initialValues: IPrequalifyFormValues = {
         price: '',
         make: '',
         model: '',
         income: '',
         credit: ''
     }
-
-    const onSubmit = (values: IPrequalifyValues, onSubmitProps: any) => {
-      // Axios fetch call to check if customer qualify for a loan.
-      axios.get("api/prequalify", { params: values })
-        .then(response => {
-          // Dispatch action to set the prequalification result in Redux,
-          // that way we can access this data later on.
-          dispatch(setPreQualificationStatus(response.data.data))
-
-          // Reset form.
-          onSubmitProps.setSubmitting(false);
-          onSubmitProps.resetForm();
-
-          // Depending on the qualification flag redirect customer to 
-          // the disqualified page or to the create user account page.
-          //
-          // Another way I think this can be done is redirecting customer to
-          // a template page, and handle the disqualified condition there
-          // to display the form or the disqualified message.
-          if(Object.is(response.data.data.prequalify_status, 1)){
-            history.push("/account");
-          } else {
-            history.push("/disqualified");
-          }
-        }).catch(err => {
-          // I am just console.log the error here, but of course it would be nice
-          // to have log monitoring & Analysis app, and maybe PagerDuty :((
-          console.log({err});
-          // Reset form.
-          onSubmitProps.setSubmitting(false);
-          onSubmitProps.resetForm();
-          // Display the actual error that comes from the server?
-          // Or just have an error flag to display a generic error message?
-          //
-          // I am showing the error from the backend in this example using a bootstrap alert
-          // on this page, but normally I like to create a custom hook using 'toastr' 
-          // https://www.npmjs.com/package/toastr that can be used in any page.
-          setErrors(err.response.data.errors);
-        })
+    
+    const onSubmit = (values: IPrequalifyFormValues) => {
+      dispatch(fetchPrequalify(values));
     }
     
 
@@ -173,20 +148,18 @@ const Prequalify: React.FC<{}> = () => {
               <button
                 type="submit"
                 className="btn btn-primary btn-block"
-                disabled={!(formik.dirty && formik.isValid) || formik.isSubmitting}
+                disabled={!(formik.dirty && formik.isValid) || loading}
               >
-                  {formik.isSubmitting ? "Please wait..." : "Submit"}
+                  {loading ? "Please wait..." : "Submit"}
               </button>
             </form>
           </div>
         </div>
         <br/>
         {
-          errors.length > 0 &&
+          error &&
             <div className="alert alert-danger" role="alert">
-              <ul>
-                {errors.map((err, i) => <li key={i}>{err}</li>)}
-              </ul>
+              { error }
             </div>
         }
         
