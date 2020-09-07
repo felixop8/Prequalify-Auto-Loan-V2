@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
 
-import userReducer from './user/userReducer';
+import registerUserReducer from './registerUser/registerUserReducer';
 import prequalifyReducer from './prequalify/prequalifyReducer';
 
 const rootReducer = combineReducers({ 
-    user: userReducer, 
+    registerUser: registerUserReducer, 
     prequalify: prequalifyReducer 
 });
 

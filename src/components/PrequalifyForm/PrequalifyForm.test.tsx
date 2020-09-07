@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, fireEvent, screen, cleanup } from '@testing-library/react';
-import Prequalify from './Prequalify';
+import PrequalifyForm from './PrequalifyForm';
 
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 
 
-describe('Prequalify', () => {
+describe('PrequalifyForm', () => {
     afterEach(cleanup);
 
     const initialState = {mockData: ''}
@@ -18,7 +18,7 @@ describe('Prequalify', () => {
     const setup = () => {
         store = mockStore(initialState)
 
-        const utils = render(<Provider store={store}><Prequalify /></Provider>)
+        const utils = render(<Provider store={store}><PrequalifyForm /></Provider>)
         
         // implicit assertions
         // because getBy search variant would throw error 

@@ -82,16 +82,16 @@ Name: **redirect user to create new account page**
 ```
 src
 ┣ components
-┃ ┣ CreateAccount
-┃ ┃ ┣ CreateAccount.module.scss
-┃ ┃ ┗ CreateAccount.tsx
+┃ ┣ RegisterUser
+┃ ┃ ┣ RegisterUser.module.scss
+┃ ┃ ┗ RegisterUser.tsx
 ┃ ┣ Disqualified
 ┃ ┃ ┣ Disqualified.module.scss
 ┃ ┃ ┗ Disqualified.tsx
-┃ ┗ Prequalify
-┃ ┃ ┣ Prequalify.module.scss
-┃ ┃ ┣ Prequalify.test.tsx
-┃ ┃ ┗ Prequalify.tsx
+┃ ┗ PrequalifyForm
+┃ ┃ ┣ PrequalifyForm.module.scss
+┃ ┃ ┣ PrequalifyForm.test.tsx
+┃ ┃ ┗ PrequalifyForm.tsx
 ┣ data
 ┃ ┗ mockServerResponses.ts
 ┣ redux

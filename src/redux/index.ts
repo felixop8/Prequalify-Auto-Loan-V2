@@ -1,2 +1,2 @@
 export { fetchPrequalify } from './prequalify/prequalifyActions';
-export { loggedIn } from './user/userActions';
+export { registerUser } from './registerUser/registerUserActions';

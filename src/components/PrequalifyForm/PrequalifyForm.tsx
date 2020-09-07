@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
 import { IPrequalifyFormValues } from '../../types';
@@ -6,23 +6,12 @@ import * as yup from 'yup';
 import { fetchPrequalify } from '../../redux';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/rootReducer';
-import { useHistory } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
-const Prequalify: React.FC<{}> = () => {
+const PrequalifyForm: React.FC<{}> = () => {
 
     const dispatch = useDispatch();
-    const history = useHistory();
-
-    const { loading, error, prequalify_status } = useSelector((state: RootState) => state.prequalify);
-  
-
-    useEffect(() => {
-      if(prequalify_status === 1) {
-        history.push("/account");
-      } else if(prequalify_status === 0) {
-        history.push("/disqualified");
-      }
-    }, [prequalify_status])
+    const { loading, error, status } = useSelector((state: RootState) => state.prequalify);
 
 
     // Validation Schema for prequalify form — Formik + Yup = :) 
@@ -48,7 +37,7 @@ const Prequalify: React.FC<{}> = () => {
     
     const onSubmit = (values: IPrequalifyFormValues) => {
       dispatch(fetchPrequalify(values));
-    }
+    };
     
 
     // Formik hook
@@ -58,6 +47,14 @@ const Prequalify: React.FC<{}> = () => {
         validationSchema
     });
 
+
+    // If promised resolved redirect user to result page.
+    // Alternatively, you can create navigation redirects through Redux middleware:
+    // https://gist.github.com/diegocasmo/06186f61766987be30d242f0b7291307#file-create_middleware-js
+    // https://gist.github.com/diegocasmo/24016343f380243dd9533ed4b0588ba3#file-redirect_middleware-js
+    // OR directly from the action creator:
+    // https://stackoverflow.com/questions/48514773/use-history-push-in-action-creator-with-react-router-v4
+    if(status) return <Redirect to={"/prequalifyResult"} />;
 
     // Formik returns a helper method called "getFieldProps()", this method returns
     // a group of functions — onChange, onBlur, value and checked — for a given field. I used the
@@ -77,6 +74,7 @@ const Prequalify: React.FC<{}> = () => {
               <div className="form-group">
                 <label htmlFor="price">Auto Purchase Price</label>
                 <input
+                  disabled={loading}
                   type="number"
                   id="price"
                   className={`form-control ${
@@ -93,6 +91,7 @@ const Prequalify: React.FC<{}> = () => {
               <div className="form-group">
                 <label htmlFor="make">Auto Make</label>
                 <input
+                  disabled={loading}
                   type="text"
                   id="make"
                   className={`form-control ${
@@ -106,6 +105,7 @@ const Prequalify: React.FC<{}> = () => {
               <div className="form-group">
                 <label htmlFor="model">Auto Model</label>
                 <input
+                  disabled={loading}
                   type="text"
                   id="model"
                   className={`form-control ${
@@ -119,6 +119,7 @@ const Prequalify: React.FC<{}> = () => {
               <div className="form-group">
                 <label htmlFor="income">Stimated Yearly Income</label>
                 <input
+                  disabled={loading}
                   type="number"
                   id="income"
                   className={`form-control ${
@@ -132,14 +133,15 @@ const Prequalify: React.FC<{}> = () => {
               <div className="form-group">
                 <label htmlFor="credit">Estimated Credit Score</label>
                 <input
+                  disabled={loading}
                   type="number"
                   id="credit"
+                  placeholder="(min 300 - max 850)"
                   className={`form-control ${
                     formik.touched.credit && formik.errors.credit ? "is-invalid" : ""
                   }`}
                   { ...formik.getFieldProps('credit')}
                 />
-                <small>(min 300 - max 850)</small>
                  {formik.touched.credit && formik.errors.credit ? 
                  <div data-testid={'errors-creditScore'} className="invalid-feedback">{formik.errors.credit}</div> :
                   null}
@@ -150,7 +152,15 @@ const Prequalify: React.FC<{}> = () => {
                 className="btn btn-primary btn-block"
                 disabled={!(formik.dirty && formik.isValid) || loading}
               >
-                  {loading ? "Please wait..." : "Submit"}
+                {loading 
+                  ? (
+                    <>
+                      <span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> 
+                      <span> Loading...</span>
+                    </>
+                    )
+                  : "Submit"
+                }
               </button>
             </form>
           </div>
@@ -167,4 +177,4 @@ const Prequalify: React.FC<{}> = () => {
     )
 }
 
-export default Prequalify
+export default PrequalifyForm

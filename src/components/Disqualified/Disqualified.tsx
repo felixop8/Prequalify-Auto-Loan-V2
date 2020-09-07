@@ -1,21 +1,8 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/rootReducer';
+import { IDisqualifiedProps } from '../../types';
 
-function Disqualified() {
-
-    // Gets the prequalify result message from Redux store - reducer 'prequalify'.
-    const selectPrequalifyResultMessage = (state: RootState) => state.prequalify.prequalify_result_message;
-    const prequalifyResultMessage = useSelector(selectPrequalifyResultMessage);
-
-
-    return (
-        <div className="container">
-            <div className="col-lg-12 text-center">
-                <h1 className="mt-5">{ prequalifyResultMessage }</h1>
-            </div>
-        </div>
-    )
+function Disqualified({message}: IDisqualifiedProps) {
+    return <><h1 className="mt-5">{ message }</h1></>
 }
 
 export default Disqualified

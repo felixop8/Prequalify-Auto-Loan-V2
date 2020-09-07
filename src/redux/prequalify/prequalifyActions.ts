@@ -1,13 +1,12 @@
-import { IPrequalifyState, FETCH_PREQUALIFY_REQUEST, FETCH_PREQUALIFY_SUCCESS, FETCH_PREQUALIFY_ERROR } from './prequalifyTypes';
+import { IPrequalifyResponse, FETCH_PREQUALIFY_REQUEST, FETCH_PREQUALIFY_SUCCESS, FETCH_PREQUALIFY_ERROR } from './prequalifyTypes';
 import { IPrequalifyFormValues } from '../../types';
 import axios from 'axios';
 
-
-export const fetchPrequalifyRequest = () => ({
+export const fetchPrequalifyRequest = {
   type: FETCH_PREQUALIFY_REQUEST
-})
+}
 
-export const fetchPrequalifySuccess = (response:IPrequalifyState) => ({
+export const fetchPrequalifySuccess = (response:IPrequalifyResponse) => ({
   type: FETCH_PREQUALIFY_SUCCESS,
   payload: response
 })
@@ -17,16 +16,15 @@ export const fetchPrequalifyError = (error:String) => ({
   payload: error
 })
 
-export const fetchPrequalify =  (formValues: IPrequalifyFormValues) => {
+export const fetchPrequalify = (formValues: IPrequalifyFormValues) => {
   return (dispatch: any) => {
-    dispatch(fetchPrequalifyRequest()); 
+    // Inform that the API call is starting.
+    dispatch(fetchPrequalifyRequest); 
     axios.get("api/prequalify", { params: formValues })
-        .then(response => {
-          setTimeout(() => {
-            dispatch(fetchPrequalifySuccess(response.data.data));
-          },5000) 
-        }).catch(error => {
-          dispatch(fetchPrequalifyError(error.message))
-        })
+        // Here, we update the app state with the results of the API call.
+        // setTimeout helps replicate latency in the request.
+      .then(response => {setTimeout(() => {
+        dispatch(fetchPrequalifySuccess(response.data))}, 3000) })
+      .catch(error => dispatch(fetchPrequalifyError(error.message)))
   }
 }

@@ -1,29 +1,28 @@
-import { IPrequalifyActionTypes, IPrequalifyState, FETCH_PREQUALIFY_REQUEST, FETCH_PREQUALIFY_SUCCESS, FETCH_PREQUALIFY_ERROR } from './prequalifyTypes';
+import { REGISTER_USER_REQUEST, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR, IRegisterUserState, IUserActionTypes } from './registerUserTypes';
 
-
-const initialState: IPrequalifyState = {
+const initialState: IRegisterUserState  = {
     loading: false,
     error: '',
     status: null,
     message: '',
 }
 
-export default function(state = initialState, action: IPrequalifyActionTypes): IPrequalifyState {
+export default function(state = initialState, action: IUserActionTypes): IRegisterUserState {
     switch (action.type) {
-      case FETCH_PREQUALIFY_REQUEST: {
+      case REGISTER_USER_REQUEST: {
         return {
-          ...state,
+          ...state, 
           loading: true
         };
       }
-      case FETCH_PREQUALIFY_SUCCESS: {
+      case REGISTER_USER_SUCCESS: {
         return {
           loading: false,
           ...action.payload,
           error: ''
         };
       }
-      case FETCH_PREQUALIFY_ERROR: {
+      case REGISTER_USER_ERROR: {
         return {
           ...state,
           loading: false,

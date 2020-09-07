@@ -1,23 +1,22 @@
-import React, { useState } from 'react'
+import React from 'react'
 import 'bootstrap/dist/css/bootstrap.css';
 import { useFormik } from 'formik';
-import { ICreateAccountValues } from '../../types';
-import { RootState } from '../../redux/rootReducer';
+import { IRegisterUserFormValues } from '../../types';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { loggedIn } from '../../redux';
-import { useSelector, useDispatch } from 'react-redux';
+import { registerUser } from '../../redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux/rootReducer';
+import { useHistory } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
-const CreateAccount: React.FC<{}> = () => {
-    const [errors, setErrors] = useState([]);
+const RegisterUserForm: React.FC<{}> = () => {
     const dispatch = useDispatch();
+    const { loading, error, status } = useSelector((state: RootState) => state.registerUser);
 
-    // Gets the prequalify result message from Redux store - reducer 'prequalify'.
-    const selectPrequalifyResultMessage = (state: RootState) => state.prequalify.prequalify_result_message;
-    const prequalifyResultMessage = useSelector(selectPrequalifyResultMessage);
+    const history = useHistory();
 
     // Validation Schema for new account form — Formik + Yup = :) 
-    const validationSchema: Yup.ObjectSchema<ICreateAccountValues> = Yup.object({
+    const validationSchema: Yup.ObjectSchema<IRegisterUserFormValues> = Yup.object({
         email: Yup.string().email('Invalid email format').required('Required'),
         password: Yup.string().min(8, 'At least 8 characters.')
         .matches(/[a-z]/, 'At least one lowercase char')
@@ -28,37 +27,15 @@ const CreateAccount: React.FC<{}> = () => {
     }).defined();
 
     // Instead of using React 'useState' hook, Formik provides its own state management methods.
-    const initialValues: ICreateAccountValues = {
+    const initialValues: IRegisterUserFormValues = {
         email: '',
         password: '',
         confirmPassword: ''
     }
 
-    const onSubmit = (values: ICreateAccountValues, onSubmitProps: any) => {
-      // Axios post request to create a new account.
-      axios.post("api/create/accounts", values)
-        .then(response => {
-          // On successful new account set user as logged in.
-          dispatch(loggedIn(response.data.data))
-          
-          //Reset form
-          onSubmitProps.setSubmitting(false);
-          onSubmitProps.resetForm();
-        }).catch(err => {
-           // I am just console.log the error here, but of course it would be nice
-          // to have log monitoring & Analysis app, and maybe PagerDuty :((
-          console.log({err});
-          // Reset form.
-          onSubmitProps.setSubmitting(false);
-          onSubmitProps.resetForm();
-          // Display the actual error that comes from the server?
-          // Or just have an error flag to display a generic error message?
-          //
-          // I am showing the error from the backend in this example using a bootstrap alert
-          // on this page, but normally I like to create a custom hook using 'toastr' 
-          // https://www.npmjs.com/package/toastr that can be used in any page.
-          setErrors(err.response.data.errors);
-        })
+    const onSubmit = (values: IRegisterUserFormValues) => {
+      dispatch(registerUser(values));
+      history.push("/prequalifyResult")
     }
 
       // Formik hook
@@ -69,6 +46,15 @@ const CreateAccount: React.FC<{}> = () => {
     });
 
 
+    // If promised resolved redirect user to result page.
+    // Alternatively, you can create navigation redirects through Redux middleware:
+    // https://gist.github.com/diegocasmo/06186f61766987be30d242f0b7291307#file-create_middleware-js
+    // https://gist.github.com/diegocasmo/24016343f380243dd9533ed4b0588ba3#file-redirect_middleware-js
+    // OR directly from the action creator:
+    // https://stackoverflow.com/questions/48514773/use-history-push-in-action-creator-with-react-router-v4
+    if(status === 201) return <Redirect to={"/logginUser"} />;
+
+
     // Formik returns a helper method called "getFieldProps()", this method returns
     // a group of functions — onChange, onBlur, value and checked — for a given field. I used the
     // spread operator on each field to reduce boilerplate.
@@ -76,9 +62,7 @@ const CreateAccount: React.FC<{}> = () => {
         <div className="container">
         <div className="row mb-5">
           <div className="col-lg-12 text-center">
-            <h1 className="mt-5">{ prequalifyResultMessage }</h1>
-            <h1 className="mt-5">Next step is to create an account:</h1>
-
+            <h1 className="mt-5">Create an account:</h1>
           </div>
         </div>
         <div className="row">
@@ -88,6 +72,7 @@ const CreateAccount: React.FC<{}> = () => {
               <div className="form-group">
                 <label htmlFor="price">Email</label>
                 <input
+                  disabled={loading}
                   type="text"
                   id="email"
                   className={`form-control ${
@@ -102,6 +87,7 @@ const CreateAccount: React.FC<{}> = () => {
               <div className="form-group">
                 <label htmlFor="make">Password</label>
                 <input
+                  disabled={loading}
                   type="password"
                   id="password"
                   className={`form-control ${
@@ -115,6 +101,7 @@ const CreateAccount: React.FC<{}> = () => {
               <div className="form-group">
                 <label htmlFor="make">Confirm Password</label>
                 <input
+                  disabled={loading}
                   type="password"
                   id="confirmPassword"
                   className={`form-control ${
@@ -128,23 +115,29 @@ const CreateAccount: React.FC<{}> = () => {
               <button
                 type="submit"
                 className="btn btn-primary btn-block"
-                disabled={!(formik.dirty && formik.isValid) || formik.isSubmitting}
+                disabled={!(formik.dirty && formik.isValid) || loading}
               >
-                  {formik.isSubmitting ? "Please wait..." : "Create account"}
+                {loading 
+                  ? (
+                    <>
+                      <span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> 
+                      <span> Loading...</span>
+                    </>
+                    )
+                  : "Register user"
+                }
               </button>
             </form>
           </div>
         </div>
         {
-          errors.length > 0 &&
-            <div className="alert alert-danger" role="alert">
-              <ul>
-                {errors.map((err, i) => <li key={i}>{err}</li>)}
-              </ul>
-            </div>
+          error &&
+          <div className="alert alert-danger" role="alert">
+            { error }
+          </div>
         }
       </div>
     )
 }
 
-export default CreateAccount
+export default RegisterUserForm
